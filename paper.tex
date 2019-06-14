@@ -6,7 +6,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{rotating}%
 \usepackage{url}
-\usepackage[notes,backend=bibtex]{biblatex-chicago}
+\usepackage[backend=bibtex, citestyle=ieee]{biblatex}
 \bibliography{paper}
 \usepackage{epsfig}%
 \usepackage{epstopdf}%
@@ -53,13 +53,72 @@
 \clearpage
 
 %%%%%%%%%%%%%%%%%%%
-\section{Motivation and project overview}
+\section{Abstract}
+
+
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
 
 Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed teams. As code is written and the project develops, various design decisions are made, which impact both existing and future code. Documentation of design decisions and the rational behind those decisions is dependent on the developer and is often recorded or dispersed between a formal document and comments in the code itself. However, documentation is often not written, read, or updated, causing developers to depend largely on the code rather than existing documentation. 
 
 We are working to help create a tool that uses mixed human-AI authoring of code patterns in order document and update code, thus enabling developers to efficiently and accurately apply and maintain a unified set of design rules. There are an infinite number of patterns that could be found in a given code base; therefore, the crux of the problem lies in determining which patterns in the given code should be used to train the machine learning algorithm. Finding an excessive number of non-existent rules or not finding important or obvious rules would discourage developers from using the tool to document their code. Hence our focus this summer will be on mining design rules from a given code base in any language in order to facilitate active documentation and maintenance of code.
 
+There are essentially three distinct situations in which such a tool may be used. Each situation offers its own challenges and requires different operational capabilities on the part of the tool. The first situation is that in which a developer who is experienced with a given code base is trying to author rules or verify that certain rules have been followed. The second situation is one in which a developer who is not as familiar with a code base but still has some base knowledge of its contents and general design is trying to explore possible rules. It may be the case that the developer just needs to see a rule in order to recognize is correctness or applicability, but she on her own might not be able to produce an accurate rule. A developer in this situation may be able to provide useful feedback on which rules are helpful and relevant to a given code base. The final situation is that of a developer who is not familiar with a code base at all and needs rule suggestions both to understand the structure of the code and to ensure it adheres to a single standard. In such a situation, the developer may even be interested in looking for examples on what kind of design decisions were previously made to which she should adhere.
+
+ ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author rules and to view correct examples and violations of rules in a given code base in real time \cite{MehrpurEtAl2019}. In the first situation a tool like the ActiveDocumentation plug-in would be able to help the developer author, check, and fix rules, efficiently and in real time. Thus, the second and third cases provide more interesting challenges. LaToza et al explored finding design patterns in an HTML document in order to perform code prediction \cite{LaTozaEtAl2019}. However, they did not try to identify design rules that might explain that pattern nor did they integrate information from sources outside of the code base such as cursor information or search history. We seek to develop a tool that combines the rule-authoring and live-update features from ActiveDocumentation with pattern finding properties. We also wish to explore how information from outside of the code base could be used to inform what patterns are identified. Since ActiveDocumentation can help those who understand a code base write rules and check for correct examples and violations of that rule, a natural next step is to work on a tool for a developer who might have some knowledge about a code base that is not comprehensive (i.e. the second situation). This forms a natural bridge between a tool that is used by a developer who simply needs to author rules for a code base she is familiar with (the first situation), and a tool that is used by someone who is completely unfamiliar with a code base and cannot provide helpful or accurate feedback about suggested rules. Thus, in this paper, we focus on developing a tool to help a developer who finds herself in the second situation.
 \clearpage
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Tool design and development}
+There are several major considerations even when we narrow our focus to a developer in the second situation. These considerations divide generally into considerations of what kinds of data are available and helpful for suggesting rules and how these kinds of data can be utilized to make relevant design rule suggestions.
+
+There are sundry sources of data available that can and do provide information about the code base and what sections of the code in which the developer might be most interested. The most obvious source of information about the code is the code itself. Using a tool called srcML, the code can be put in a specific XML format that can then be searched using XPaths. Thus we can identify all kinds of information about the code itself, including function and class names and declarations, member variables, and relationships between classes like child and parent classes. Information is also available from the IDE itself. Such information can include the cursor's current and previous location, the user's search history, and which file windows are currently open in the project. Finally, the tool itself could be a possible source of information. For example, information about existing rules may be used to help improve the relevancy of the design rules presented to the developer.
+
+There are a couple of approaches that could be taken with respect to different approaches to ensure relevant design rule suggestions. One way of viewing this challenge is to view it as a source of natural language programming (NLP) problem. One group of researchers were trying to improve code suggestions and viewed their challenge as analogous to a more traditional NLP problem of trying to fill in a missing word in a sentence. They developed a statistical language model to aid in providing suggestions for different code snippets \cite{RaychevEtAl2014}. We could think of our challenge as analogous to an NLP problem that aims to outline to a corpus of text or maybe, even more abstractly, find rhetorical devices in a text. Alternatively, we could simply rely more on traditional papers and research that have been conducted in this area that do not rely on NLP techniques to provide solutions. Both perspective may prove useful in the initial stages of research that entail exploring different ways that information is stored and what information about developer activity has seemed most helpful in designing related tools. 
+
+
+
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%
+\section{Product description}
+
+
+
+\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Methodology}
+
+
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%
+\section{User study}
+
+
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%
+\section{Related works}
+
+
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+
+
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%
