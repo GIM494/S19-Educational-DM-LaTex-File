@@ -40,7 +40,7 @@
 \usepackage{bibentry}
 
 \title{S19: REU Research Document}
-\author{Emily Slaughter, Gennie Mansi }
+\author{Emily Slaughter, Gennie Mansi}
 
 \begin{document}
 
@@ -61,15 +61,13 @@
 %%%%%%%%%%%%%%%%%%%
 \section{Introduction} \label{intro}
 
-Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed teams. As code is written and the project develops, various design decisions are made, which impact both existing and future code. Documentation of design decisions and the rational behind those decisions is dependent on the developer and is often recorded or dispersed between several disparate locations, including a formal document, comments in the code, and the developers themselves. However, documentation is often not written, read, or updated, causing developers to depend largely on the code and other sources of information rather than explicit, written documentation. 
+Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed teams. As code is written and the project develops, various design decisions are made, which impact both existing and future code: ideally, as code is authored or modified, it should follow design rules used to author prior code. The \textit{design rules} for a project are the set of choices about the code's design and their implementation. Documentation of design rules and the rationale behind them is dependent on the developer, and when it is recorded, it is often dispersed among several disparate locations, including a formal document, comments in the code, and the developers themselves. However, documentation is often not written, read, or updated, and coworkers are not always a reliable resource \cite{KoEtAl2007}. Lack of documentation ultimately causes newcomers to a project to depend largely on the code rather than explicit, written documentation to understand such project-specific design rules.
 
-Ideally, as code is authored or modified, it should follow previous design rules use to author prior code.
-The \textit{design rules} for a project is the set of choices about the code's design and how those choices were implemented. Several sources of information, including search history, cursor location, event logs, debugger information, and the code itself can indicate what elements in the code base are most pertinent to the user and are most likely to contain design rules of interest. Some information about design rules may only be recorded in the memories of co-workers, and thus access to this kind of information is also critical for developers trying to understand and use an existing code base. 
+A tool that mines and recommends design rules has the potential to facilitate active documentation of code, allowing developers to efficiently and accurately apply and maintain a unified set of design rules. There are an exponential number of patterns that could be found in a given code base, and some rules have greater relevance than others. Finding an excessive number of non-existent rules or missing important rules would discourage developers from using the tool to document their code. Hence our focus is to intelligently determine which patterns in a codebase of any language are most meaningful as rules and how to find them reasonably quickly.
 
-Mixed human-AI authoring of code patterns can greatly assist developers to efficiently and accurately develop and maintain a unified set of rules. There are an infinite number of patterns that could be found in a given code base; therefore, the crux of the problem lies in determining which patterns in the given code should be used to train the machine learning algorithm. Hence our focus is on mining design rules from a given code base in any language in order to facilitate active documentation and maintenance of code.
+Several sources of information in addition to the code itself, including search history, cursor location, event logs, and debugger information can indicate what elements in the code base are most pertinent to the user and are most likely to contain design rules of interest. We explore how this information from outside of the code base can be combined with the code base itself to inform what patterns are identified. Ultimately, such a tool will greatly increase the amount of up-to-date documentation available to developers. We seek to develop a tool that automates the manual rule-authoring capabilities of ActiveDocumentation \cite{MehrpurEtAl2019} and preserves its live-update features.
 
-We explore how information from outside of the code base could be used to inform what patterns are identified.We seek to develop a tool that combines that has both automatic and manual rule-authoring capabilities. It should also automatically provide live updates with examples and violations of authored design rules. Ultimately, such a tool will greatly increase the amount of up-to-date documentation available to developers.
- 
+Association rule mining? Some brief description of our algorithm?
  
  \clearpage
 
@@ -83,13 +81,11 @@ Given the code for a project and some external information such as cursor inform
 
 When considering our task, there exist two significant considerations: (a) what kinds of data are available and helpful for suggesting rules, and (b) what kind of algorithm can be utilized with these sources of data in order to make relevant design rule suggestions. We will begin by first addressing different sources of information that are available and most useful for our purpose. Then, we will proceed to discuss our algorithm for design rule mining.
 
-
 \subsection{Assumptions about the user} \label{assumptions}
 
-Developers can be divided into three categories with respect to their familiarity with a project or code base. First, a developer may be experienced with a given code base. She would have a thorough understanding of the project, its objectives, and its implementation. She is in a position that allows her to author design rules and verify that certain rules have been followed through the project. Second, a developer may be partially knowledgable about a project and its implementation. Such a developer may have a general familiarity with the code and its implementations, but is not able to easily or confidently author design rules or may simply wish to explore possible existing design rules. On her own she is not be able to produce an accurate rule, but might be able to see a rule and provide useful feedback on its correctness or relevancy. Finally, a developer may be completely unfamiliar with a code base. Existing design rules and documents would be extremely helpful in helping her understand the structure of the code. She may also need to frequently consult co-workers about code standards and patterns if there is a significant lack of written documentation. In such a situation, the developer may even be interested in looking for examples on what kind of existing design rules to which she should adhere.
+Developers can be divided into three categories with respect to their familiarity with a project or code base. First, a developer may be experienced with a given code base. She has a thorough understanding of the project, its objectives, and its implementation. She is in a position that allows her to author design rules and verify that certain rules have been followed through the project. Second, a developer may be partially knowledgable about a project and its implementation. Such a developer may have a general familiarity with the code and its implementations, but is not able to easily or confidently author design rules or may simply wish to explore possible existing design rules. On her own, she is not be able to produce an accurate rule, but might be able to see a rule and provide useful feedback on its correctness or relevancy. Finally, a developer may be completely unfamiliar with a code base. Existing design rules and documents would be extremely helpful in helping her understand the structure of the code. She may also need to frequently consult co-workers about code standards and patterns if there is a significant lack of written documentation. In such a situation, the developer may even be interested in looking for examples on what kind of existing design rules to which she should adhere.
 
- Work has already been completed with regards to the first category, and while much research has been done in code suggestion, completely automated design rule generation seems largely unexplored (see Section~\ref{relatedWorks}). Therefore, an algorithm developed with the second category of developers in mind forms a natural bridge between human authored design rules and completely automated rule authoring. Consequently, we assume the developers for which we are designing our algorithm have some general familiarity with the code and can identify proper design rules if supplied with a set of rules to consider. Thus, feedback form the developer about hypothesized rules is dependable, enabling mixed human-AI rule authoring.
-
+Work has already been completed with regards to the first category of developers, and while much research has been done in code suggestion, completely automated design rule generation seems largely unexplored (see Section~\ref{relatedWorks}). Therefore, an algorithm developed with the second category of developers in mind forms a natural bridge between human-authored design rules and completely automated rule authoring. Consequently, we assume the developers for which we are designing our algorithm have some general familiarity with the code and can identify proper design rules if supplied with a set of rules to consider. Thus, feedback form the developer about hypothesized rules is dependable, enabling mixed human-AI rule authoring.
 
 \subsection{Sources of Information} \label{infoSrcs}
 
@@ -101,7 +97,7 @@ Several studies have demonstrated that as developers work and explore a project,
 
 Ko et al investigate what sources of information developers use to accomplish a task and how that information affects developers' workflow throughout the day. They report that developers look at a variety of sources to accomplish a task, including check-in logs, bug reports, content management systems, version control systems, and other coworkers. Additionally, they identify knowledge about design and program behavior as the type of information that is most often deferred since unavailable coworkers are often the only source of knowledge. Developers sought out coworkers most often when there are information needs with regards to code design. Other questions to coworkers centered around following the team's conventions. Developers asked specific questions regarding what code caused different program states and behaviors and what statically related to the code of interest, but pursued the answers to these questions by starting with a hypothesis that they largely developed by using their intuition, asking coworkers, looking for execution logs, scouring bug reports, and using the debugger. They then often refined their hypothesis by using the search tool to answer questions about which sections of code performed similar operations \cite{KoEtAl2007}. 
 
-Furthermore, Fritz et al conducted a survey of nineteen professional Java programmers in order to generate a degree of interest model to reflect developers' knowledge of code \cite{FritzEtAl2007}. The researchers' model was based on the total number of interactions the programmer has with an element and the recency of that interaction. Other factors they identified that could be used to improve their model included authorship of program elements, the role of elements, and the task being performed \cite{FritzEtAl2007}.
+Furthermore, Fritz et al conducted a survey of nineteen professional Java programmers in order to generate a degree-of-interest (DOI) model to reflect developers' knowledge of code \cite{FritzEtAl2007}. The researchers' model was based on the total number of interactions the programmer has with an element and the recency of that interaction. Other factors they identified that could be used to improve their model included authorship of program elements, the role of elements, and the task being performed \cite{FritzEtAl2007}.
 
 Based off of  these findings, we identified the debugger (?), code base, cursor location and search histories, and the developer herself as the most pertinent and accessible sources of information for our algorithm.
 
@@ -118,7 +114,6 @@ Based off of  these findings, we identified the debugger (?), code base, cursor 
 \subsection{Algorithm} \label{algm}
 
 \subsubsection{Filtering information}
-\subsubsection{Identifying token}
 \subsubsection{Generating queries}
 \subsubsection{Selecting queries to present to user}
 
@@ -135,8 +130,6 @@ There are a couple of approaches that could be taken with respect to different a
 
 
 
-
-
 \clearpage
 
 %%%%%%%%%%%%%%%%%%%
@@ -145,12 +138,10 @@ There are a couple of approaches that could be taken with respect to different a
 
 Many tools and methods have been devised to augment programmers' ability to accomplish a task including code recommender systems for novices \cite{HartmannEtAl2010}, search tools for identifying bugs \cite{HovemeyerPugh2004}, search tools for identifying relevant API functions and the sections of code that need to be altered \cite{RongEtAl2016}, and code suggestion \cite{RaychevEtAl2014}. However, one area that seems largely unexplored is tools that facilitate the documentation of code.
 
-Some researchers developed a tool to help a person who is new to an open-source software project find relevant artifacts to a project in order to facilitate their ability to more quickly perform a given task. They consider all of the previously produced material, including versions of the source, the bugs, archived electronic communication, and web documents, to suggest possibly relevant sources of information to a user \cite{CubranicMurphy2003}.
+Through what is called implicit group memory, Hipikat is a client-server system that automates the mentor-like relationship that develops between developers who are new to a project and senior developers who watch over the newcomers and pass down knowledge. Hipikat learn from four types of artifacts and communications stored in a project's history: bug and feature descriptions, source file revisions, messages posted on developer forums, and other project documents. Artifacts may be queried, and the artifact database may be searched \cite{CubranicAndMurphy2003}.
 
 LaToza et al explored finding design patterns in an HTML document in order to perform code prediction \cite{LaTozaEtAl2019}. However, their tool does not identify design rules that might explain that pattern. 
-ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author rules and to view correct examples and violations of rules in a given code base in real time \cite{MehrpurEtAl2019}. The ActiveDocumentation plug-in helps the developer author, check, and fix rules, efficiently and in real time. It automatically updates its interface with correct examples and violations of design rules written in the program \cite{MehrpurEtAl2019}. Neither of these tools integrates information from sources outside of the code base such as cursor information or search history. Mylar is a tool designed for the Eclipse IDE that tries to highlight file names and code segments that are most likely to contain relevant information for a developer's current task. The highlighting is based off a model that depends on which elements of the code have been edited and accessed most recently \cite{KerstenMurphy2005}.
-
-
+ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author rules and to view correct examples and violations of rules in a given code base in real time \cite{MehrpurEtAl2019}. The ActiveDocumentation plug-in helps the developer author, check, and fix rules, efficiently and in real time. It automatically updates its interface with correct examples and violations of design rules written in the program \cite{MehrpurEtAl2019}. Neither of these tools, however, integrates information from sources outside of the code base such as cursor information or search history. Mylar is a tool that exists within the Eclipse IDE and encodes a programmer's activity with code into a DOI model that can then be used to highlight information in a program that may be related to the task that a developer is completing. This model focuses on individual program elements without taking into account the possible structural relationships that may exist between program elements \cite{KerstenEtAl2005}.
 
 
 \clearpage
@@ -161,12 +152,6 @@ ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author ru
 It might be helpful to adapt our tool to be able to work with team environments. 
 
 I don't really feel like discussing things any more. Why is this the only part that is called the discussion? I mean, what has been the rest of everything that has been written? Or did you just skip here? Is that why it has been called ``discussion"?
-
-\clearpage
-%%%%%%%%%%%%%%%%%%%
-
-\section{Discussion}\label{disc}
-
 
 \clearpage
 
