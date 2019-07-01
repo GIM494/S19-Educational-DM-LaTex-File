@@ -61,14 +61,15 @@
 %%%%%%%%%%%%%%%%%%%
 \section{Introduction} \label{intro}
 
-Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed teams. As code is written and the project develops, various design decisions are made, which impact both existing and future code: ideally, as code is authored or modified, it should follow design rules used to author prior code. The \textit{design rules} for a project are the set of choices about the code's design and their implementation. Documentation of design rules and the rationale behind them is dependent on the developer, and when it is recorded, it is often dispersed among several disparate locations, including a formal document, comments in the code, and the developers themselves. However, documentation is often not written, read, or updated, and coworkers are not always a reliable resource \cite{KoEtAl2007}. Lack of documentation ultimately causes newcomers to a project to depend largely on the code rather than explicit, written documentation to understand such project-specific design rules.
+Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed teams. As code is written and the project develops, various design decisions are made, which impact both existing and future code: ideally, as code is authored or modified, it should follow design rules used to author prior code. A project's \textit{design rules} are the set of choices about the code's design and their implementation. Documentation of design rules and the rationale behind them is dependent on the developer, and when it is recorded, it is often dispersed among several disparate locations, including a formal document, comments in the code, and the developers themselves. However, documentation is often not written, read, or updated, and coworkers are not always a reliable resource \cite{KoEtAl2007}. Lack of documentation ultimately causes newcomers to a project to depend largely on the code rather than explicit, written documentation to understand such project-specific design rules.
 
-A tool that mines and recommends design rules has the potential to facilitate active documentation of code, allowing developers to efficiently and accurately apply and maintain a unified set of design rules. There are an exponential number of patterns that could be found in a given code base, and some rules have greater relevance than others. Finding an excessive number of non-existent rules or missing important rules would discourage developers from using the tool to document their code. Hence our focus is to intelligently determine which patterns in a codebase of any language are most meaningful as rules and how to find them reasonably quickly.
+A tool that mines and recommends design rules has the potential to facilitate active documentation of code, allowing developers to efficiently and accurately apply and maintain a unified set of design rules. There are an exponential number of patterns that could be found in a given code base, and some rules have greater relevance than others. Finding an excessive number of non-existent rules or missing important rules would discourage developers from using the tool to document their code. Hence our focus is to intelligently and efficiently determine and interpret the patterns in a codebase that are most indicative and representative of meaningful design rules.
 
 Several sources of information in addition to the code itself, including search history, cursor location, event logs, and debugger information can indicate what elements in the code base are most pertinent to the user and are most likely to contain design rules of interest. We explore how this information from outside of the code base can be combined with the code base itself to inform what patterns are identified. Ultimately, such a tool will greatly increase the amount of up-to-date documentation available to developers. We seek to develop a tool that automates the manual rule-authoring capabilities of ActiveDocumentation \cite{MehrpurEtAl2019} and preserves its live-update features.
 
-Association rule mining? Some brief description of our algorithm?
+\tcr{Note the following paragraph (surrounded by red brackets) is a rough outline of what our process will be; it is vague and most certainly will change: [ }Our approach to suggesting rules is threefold. First, we identify and record the presence of key features in the code base in a binary database that associates the features with specific sections of the code. Second, we use association rule mining to associate these key features together. Finally, we use the associated key features to construct the most likely rules, which we present to the user for acceptance or modification. \tcr{]}
  
+ We structure the rest of this paper as follows: In Section~\ref{probDesc}, we define our goal within the context of association rule mining, and we describe our approach given the assumptions we are making about the user. In Section~\ref{toolInterface}, we describe the general structure of the tool interface we would like to implement. Finally, in Section~\ref{relatedWorks} and Section~\ref{disc} we present related works and discuss the efficiency and limitations of our implementation.
  \clearpage
 
 
@@ -79,7 +80,7 @@ Association rule mining? Some brief description of our algorithm?
 
 Given the code for a project and some external information such as cursor information, we wish to derive a set of most likely and relevant design rules. We will then integrate our algorithm for mining these design rules into an interface that allows developers to seamlessly mine and write design rules and to see violations and correct examples of these rules. 
 
-When considering our task, there exist two significant considerations: (a) what kinds of data are available and helpful for suggesting rules, and (b) what kind of algorithm can be utilized with these sources of data in order to make relevant design rule suggestions. We will begin by first addressing different sources of information that are available and most useful for our purpose. Then, we will proceed to discuss our algorithm for design rule mining.
+When considering our task, there exist two significant considerations: (a) what kinds of data are available and helpful for suggesting rules, and (b) what kind of algorithm can be utilized with these sources of data in order to make relevant design rule suggestions. We will begin by first addressing different sources of information that are available and most useful for our purpose. Then, we will proceed to discuss our association rule mining algorithm for identifying code patterns and synthesizing design rules.
 
 \subsection{Assumptions about the user} \label{assumptions}
 
@@ -101,20 +102,33 @@ Furthermore, Fritz et al conducted a survey of nineteen professional Java progra
 
 Based off of  these findings, we identified the debugger (?), code base, cursor location and search histories, and the developer herself as the most pertinent and accessible sources of information for our algorithm.
 
-\textit{Debugger.} [Insert something later when we know what exactly we will be using about how we are using the debugger as a source of information ]
+\textit{Debugger.} [Insert something later when we know how exactly we will be using the debugger as a source of information ]
 
-\textit{Cursor location.} [Insert something later when we know what exactly we will be using about how we are using the cursor location as a source of information ]
+\textit{Cursor location.} [Insert something later when we know how exactly we will be using the cursor location as a source of information ]
 
-\textit{Search history.} [Insert something later when we know what exactly we will be using about how we are using the search history as a source of information ]
+\textit{Search history.} [Insert something later when we know how exactly we will be using the search history as a source of information ]
 
-\textit{Developer.} [Insert something later when we know what exactly we will be using about how we are using the developer as a source of information ]
+\textit{Developer.} [Insert something later when we know how exactly we will be using the developer as a source of information ]
+
+\textit{Code base.} [Insert something later when we know how exactly we will be using the code base as a source of information ]
 
 
 
 \subsection{Algorithm} \label{algm}
 
-\subsubsection{Filtering information}
+We need an efficient and compact way to represent the sundry features of a codebase and of identifying which features commonly appear together. The field of association rule mining is recognized for its ability to discover sets of items that co-occur with high prevalence without much previous information about the population or features \cite{AiEtAl2018}. Given that we are trying to associate a set of features for a codebase without any dependable knowledge about which features are most likely to be most common, association rule mining presents useful and powerful tools. There are several challenges that we encounter. First we have a large number of features, especially in comparison to the number of files in which those features are found, so our chosen algorithm must work with high dimensional data. Second, code bases are active documents; they are constantly changing and updating, and their features are constantly changing as well, so our algorithm must work with incremental data. Finally, many association rule mining algorithms are recursive, but the data structure used to compact and mine the key features can become so deep that a recursive algorithm can cause a stack overflow error, so our algorithm should be iterative. Therefore, we need an incremental, non-recrusive association rule miner that can efficiently analyze high dimensional data. In the following subsections, we begin by establishing the notation we will use for the rest of the paper; we discuss how we filter, aggregate, and update the database used with the association rule miner; we discuss the details of the algorithm we implemented and how we generate queries using the key features we association. Finally, we discuss how queries are selected and presented to the user.
+
+\subsubsection{Notation}
+
+In association rule mining, the database, $D$, from which the rules are mined are composed of features (columns) and transactions (rows). The set of features, more commonly referred to as \textit{items} are what we wish to find associations between. Each transaction, represents an instance of the dataset that contain certain features. In our case, each file is a transaction that contains several code features which we wish to associate in order to derive rules. Let $I=\{i_1, i_2, \ldots, i_n\}$ be the set of all $n$ features that are present in the code base that we use to identify patterns, and let $T$ be a transaction, which is a subset of $I$. An association rule is an inference between two subsets, $X$ and $Y$, such that $X \rightarrow Y$ and $X \cap Y = \emptyset$. In association rule mining, $X$ is referred to as the \textit{antecedent} and $Y$ is known as the \textit{consequent}. The \textit{frequency} is the number of rows that contain $X$; the \textit{support} is the fraction of all rows that contain the itemset. The support of $X \rightarrow Y$ is the union of $X$ and $Y$. The confidence of $X \rightarrow Y$ is the conditional probability of $Y$ given $X$. In association rule mining, an itemset is considered \textit{frequent} if its support is greater than or equal to a user-specified minimum support threshold. 
+
+\subsubsection{Filtering, aggregating, and updating information}
+
+\subsubsection{Identifying code patterns}
+
 \subsubsection{Generating queries}
+
+
 \subsubsection{Selecting queries to present to user}
 
 \clearpage
@@ -138,10 +152,23 @@ There are a couple of approaches that could be taken with respect to different a
 
 Many tools and methods have been devised to augment programmers' ability to accomplish a task including code recommender systems for novices \cite{HartmannEtAl2010}, search tools for identifying bugs \cite{HovemeyerPugh2004}, search tools for identifying relevant API functions and the sections of code that need to be altered \cite{RongEtAl2016}, and code suggestion \cite{RaychevEtAl2014}. However, one area that seems largely unexplored is tools that facilitate the documentation of code.
 
-Through what is called implicit group memory, Hipikat is a client-server system that automates the mentor-like relationship that develops between developers who are new to a project and senior developers who watch over the newcomers and pass down knowledge. Hipikat learn from four types of artifacts and communications stored in a project's history: bug and feature descriptions, source file revisions, messages posted on developer forums, and other project documents. Artifacts may be queried, and the artifact database may be searched \cite{CubranicAndMurphy2003}.
+Through what is called implicit group memory, Hipikat is a client-server system that automates the mentor-like relationship that develops between developers who are new to a project and senior developers who watch over the newcomers and pass down knowledge. Hipikat learn from four types of artifacts and communications stored in a project's history: bug and feature descriptions, source file revisions, messages posted on developer forums, and other project documents. Artifacts may be queried, and the artifact database may be searched \cite{CubranicMurphy2003}.
 
 LaToza et al explored finding design patterns in an HTML document in order to perform code prediction \cite{LaTozaEtAl2019}. However, their tool does not identify design rules that might explain that pattern. 
-ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author rules and to view correct examples and violations of rules in a given code base in real time \cite{MehrpurEtAl2019}. The ActiveDocumentation plug-in helps the developer author, check, and fix rules, efficiently and in real time. It automatically updates its interface with correct examples and violations of design rules written in the program \cite{MehrpurEtAl2019}. Neither of these tools, however, integrates information from sources outside of the code base such as cursor information or search history. Mylar is a tool that exists within the Eclipse IDE and encodes a programmer's activity with code into a DOI model that can then be used to highlight information in a program that may be related to the task that a developer is completing. This model focuses on individual program elements without taking into account the possible structural relationships that may exist between program elements \cite{KerstenEtAl2005}.
+ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author rules and to view correct examples and violations of rules in a given code base in real time \cite{MehrpurEtAl2019}. The ActiveDocumentation plug-in helps the developer author, check, and fix rules, efficiently and in real time. It automatically updates its interface with correct examples and violations of design rules written in the program \cite{MehrpurEtAl2019}. Neither of these tools, however, integrates information from sources outside of the code base such as cursor information or search history. Mylar is a tool that exists within the Eclipse IDE and encodes a programmer's activity with code into a DOI model that can then be used to highlight information in a program that may be related to the task that a developer is completing. This model focuses on individual program elements without taking into account the possible structural relationships that may exist between program elements \cite{KerstenMurphy2005}.
+
+\bigskip
+
+\tcr{Imagine some bridge between the two of these or maybe the following section gets shifted up to the algorithm section??}
+
+A naive approach, known as the Apriori approach, is to generate all candidate sets and then eliminate candidate sets whose support is less than the minimum support threshold. Depending on the number of  items, this can grow computationally prohibitive, so many authors look for ways to eliminate candidate set generation and to minimize the number of times the database needs to be scanned in order to produce frequent itemsets and association rules \cite{NarvekarSyed2015, WeiEtAl2014, EzeifeSu2002, LiEtAl2006}. 
+
+\tcr{Continued discussion of FP mining; I'm holding off on inserting this into the document until we are more certain about the algorithm we wish to use, just so that we only pick the most related works.}
+
+
+
+
+\bigskip
 
 
 \clearpage
