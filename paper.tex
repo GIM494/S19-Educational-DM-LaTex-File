@@ -15,9 +15,18 @@
 \usepackage{color}
 \usepackage[hang,flushmargin]{footmisc} 
 \pdfminorversion 3
-\usepackage{pbox}
+
 
 \usepackage{subfig}
+
+\usepackage{float}
+\usepackage{siunitx}
+\usepackage{soul}
+\usepackage{graphicx,caption}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{xcolor,colortbl}
+\usepackage{longtable}
 
 \newcommand{\hilt}[1]{\colorbox{green}{#1}}
 \usepackage{setspace}
@@ -74,7 +83,7 @@
 %%%%%%%%%%%%%%%%%%%
 \section{Abstract} \label{abstract}
 
-The term design rules refers to the choices about the design of a project and how those choices are implemented. Design rules are integral in maintaining project coherency and forwards and backwards compatibility. Documentation is critical to preserving information about design rules. However, most documentation is not updated frequently, and only individual developers know critical pieces of information. We developed an algorithm that can represent the information contained in a code base and automatically suggest likely design rules. Our results demonstrate that our algorithm can successfully represent and identify significant design rules, and has the potential to be used to automatically generate documentation for a project.
+Documentation is critical to preserving information about the choices about the design of a project and how those choices are implemented. However, most documentation is not updated frequently, and often only individual developers know critical pieces of information, which are integral in maintaining project coherency and forwards and backwards compatibility.  We developed an algorithm that can represent the information contained in a code base and automatically suggest likely design rules. Our results demonstrate that our algorithm can successfully represent and identify significant design rules, and has the potential to be used to automatically generate documentation for a project.
 
 
 
@@ -251,117 +260,98 @@ The reason such association rules were output is due to the fact that all the at
 	
 	We explored 6 different groups of files to test if we could find the attributes of interest. The focus class was chosen as the class with the largest file size that was not the parent class if there was an inheritance structure. We present the groups of classes that were successfully used to identify one of our target design rules. Under each group of classes, we list the rules that we found along with an explanation. A discussion of what rules could not be discovered and why follows this portion. Supplementary material contains the output for all six groupings. 
 	
-	\subsubsection{Command classes}
-		This group included classes that extended the Command class and the Command class itself. The focus class for this group was \inlinecode{Java}{QuestioningCommand.java}.
-		
-		\paragraph {Rules found}
-			
-			\subparagraph{Commands must implement execute} IF a class is a subclass of Command THEN it must implement execute.
-			
-			The attributes of interest that are generated here are (1) class extends Command, (2) has public function execute(), (3) has void function execute(). We output both these attributes, so we should be able to find them together in frequent itemsets. We used support 60\% and confidence 80\% for all our tests. 
-		\begin{itemize}
-			\item (1) and (2) were found together in approximately 22\% of all FIs.
-			\item (1) and (3) were found together in approximately 12\% of all FIs.
-			\item (1), (2), and (3) were found together in approximately 6\% of all FIs.				\item (2) and (3) were found together in approximately 12.5\% of all FIs. 
-		\end{itemize}
-		
-			\subparagraph{Commands should persist all data they are given.} IF a constructor is for a subclass of Command THEN it should store each parameter given. 
-			
-			The attributes of interest that we represent are (1) class extends command and (2) constructor stores each parameter given. We used support 60\% and confidence 80\% for all our tests. Both attributes were found in about 24\% of all FIs.
-			
-				
-	\subsubsection{Classes and subclasses that extend DTO }
-		This group included classes that extended the DTO class and the subclasses of the classes that extended the DTO class. The focus class for this group was \inlinecode{Java}{FunctionInFirebase.java}.
-		
-		\paragraph {Rules found}
-		
-		\subparagraph{DTOs must have a zero-argument constructor.} IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body.
-		
-		The attributes of interest are (1) class extends DTO, (2) class has zero-args constructor, and (3) class has empty body. With 60\% support and 80\% confidence, these three attributes were found in 6.5\% of the FIs.
-
 	
-	\subsubsection{Classes, subclasses, and sub-subclasses that extend DTO}
-		This group included classes that extended the DTO class and the subclasses and sub-subclasses of the classes that extended the DTO class. The focus class for this group was  \inlinecode{Java}{FunctionInFirebase.java}.
-		
-
-		\paragraph {Rules found}
-		
-		\subparagraph{DTOs must have a zero-argument constructor.} IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body.
-		
-		The attributes of interest are (1) class extends DTO, (2) class has zero-args constructor, and (3) class has empty body. With 60\% support and 80\% confidence, these three attributes were found in 5.1\% of the FIs.
-		
-		
-	\subsubsection{@Entity classes}
-		This group included all the classes that had the @Enitty notation placed directly above them. The focus class for this group was \inlinecode{Java}{Project.java}.
-		\paragraph {Rules found}
-		
-		\subparagraph{@Entity classes must have an @id field.} IF a class has an @Entity annotation THEN it must have a field annotated with @Id. 
-		
-		The attributes of interest are (1) class has @Entity notation and (2) member field has annotation @id. With 50\% support and 80\% confidence, approximately 22\% of all FIs generated by the FP growth algorithm contained these two attributes.
-		
-		\subparagraph{Subclasses of @Entity classes must be indexed.} IF a class is a subclass of an @Entity class THEN it needs to be indexed ('index=true'). \tcr{[I couldn't find exact numbers on what percentages were output for these groupings.]}
-		
-		\subparagraph{@Entity classes must have a zero-argument constructor.} IF a class is an entity THEN it needs to have a zero-argument constructor.
-		
-		The attributes of interest are (1) has @Entity annotation and (2) class has zero-args constructor. With 60\% support and 80\% confidence, approximately 20\% of the FIs generated by the FP growth algorithm contained these two attributes; as a side note, if support was lowered to 50\%, then approximately 23\% of the FIs generated contained both attributes.
-
-
-
-	\subsubsection{Artifact classes }
-		This group included all the classes that extended the Artifact class. The focus class for this group was \inlinecode{Java}{Function.java}.  
-
-		\paragraph {Rules found}
-		
-		\subparagraph{Artifacts should be marked as a data region with an @Entity annotation}.  IF an object is an artifact subclass THEN it needs to be an entity.
-
-		In this case, the attributes of interest are ``extends Artifact” and ``class has @Entity annotation”. With 60\% support and 80\% confidence, just under half of all FIs generated by the FP growth algorithm contained these two attributes. 
-		
-
-
-
-
-	
-	\subsubsection{Rules not found}
-	
-		\subparagraph{Creating an Artifact should be indirected through a Command.} IF a new Artifact is to be created THEN its constructor should be invoked only by its corresponding Command class. 
-		
-		We are not able to generate this rule because we do not create attributes that would allow us to find this rule. We do generate an attribute that would indicate that an Artifact object is created, and attributes indicating that there were functions in which the respective Artifact class constructor was called, but there isn’t a way to communicate the idea of invoking the Artifact constructor only with the corresponding Command class.
-		
-		\subparagraph{Communication between artifacts should be indirected through a Command.} IF an Artifact needs to communicate with another artifact THEN it should create a Command describing the desired action to be performed.
-
-        We also can’t represent this rule with our current set of attributes for similar reasons as the previous rule. The difficult part of this rule is that we output attributes in the form “function foo() calls ECommand constructor” or “function foo() calls FCommand constructor”, which will not get associated together in a group because the names of the classes are different. Further, the program uses a single focus class to generate a set of global attributes that are searched for in related classes. Consequently, we pass the function an xml file that contains only the file for the focus class, which means we cannot find out what the parent of the current class extends since the file only contains the information for the focus class. 
-        
-        		\subparagraph{All Microtask commands must be handled by Command subclasses.} IF a method is a static method on Command THEN it should implement its behavior by constructing a new Command subclass instance.
-		
-		Again, while we can/do output attributes for the “IF” portion of this rule, we cannot output attributes for the “THEN” portion of this rule because we only create attributes from a single input class, and therefore cannot create an attribute that represents this information.
-
-		\subparagraph{Commands should not be publicly visible.} IF a class is a subclass of Command THEN it should not be public.
-		
-		While we do output visibility specifiers and inheritance information, we cannot output this rule because we only output visibility specifiers for the focus class. Therefore, if the focus class is public, we will output “class is public” but we will not output any attributes about private or protected classes. One solution is to include default attributes such as “is private class” and “is protected class” in the global set of attributes. Theoretically, we can find implement our attribute outputting algorithm so that this information can be output. However, our current method does not allow us to output attributes that could be used to represent this rule.
-		
-		\subparagraph{@Entity classes must be registered in the CrowdServlet class.} IF a class is an Entity class or subclass THEN it must be registered in CrowdServlet by ObjectifyService.
-		
-		Again, we cannot output this rule because of the kinds of attributes that are output by our approach. In order for a class to be ``registered", a function call to the register function must be made by an ObjectifyService object with the class to be registered as the argument. The difficulty comes in trying to track that a function call has been made by a particular class. Without any prior information, it is difficult to recognize which attributes should be made about which function calls in which classes. Since there are thousands and even hundreds of thousands of functions calls in a given code base, the scalability of trying to output information about every function call makes representing this information in attributes rather intractable. 
-
-		
-		\subparagraph{Save() calls should always be committed immediately.} IF the save method is called THEN the now() method must be followed immediately.
-		
-		A similar problem to the previous rule exists to this one. Any number of attributes could be generated with all the possible pattern combinations of ordered function calls; however, this would cause an explosion of attributes that would likely render outputting attributes and finding associations intractable. One possible way of trying to find this rule might use a pattern finding technique from association rule mining. The database such a technique might be trained on may be in which each row represents a different function, and the attributes for each function would represent the function calls made with in that section of the code. A sequential pattern mining algorithm would look for the patterns in this database.
-		
-
-	
-
-				
-		
+	We used support 60\% for all our tests, except for the test used to generate the rule ``IF a class has an @Entity annotation THEN it must have a field annotated with @Id"; a support of 50\% was used. Lowered support was used to restrict the number of FI's produced by the algorithm. Although confidence is used in many ARM techniques, it is not used in generating FI's; thus, we did not have to specify a confidence level for the algorithm. 
 	
 	
+\definecolor{yellow}{rgb}{1,1,0.6}
+\newcommand{\textcoloryellow}{\cellcolor{yellow}}  %{0.9}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+\hline
+\multicolumn{3}{|l|}{\textcoloryellow{\textbf{Command classes}}} \\\hline
+\multicolumn{3}{|l|}{Focus class: QuestioningCommand.java} \\\hline
+\multicolumn{3}{|l|}{Peripheral classes: Command class and classes that extend Command} \\\hline
+Rule & Attributes & \% FI that contain \\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+IF a class is a subclass of Command THEN it must implement execute. & (1) class extends Command \newline (2) has public function execute() \newline (3) has void function execute() & 6\%\\\hline
+IF a constructor is for a subclass of Command THEN it should store each parameter given. & (1) class extends command \newline (2) constructor stores each parameter given & 24\%\\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+\multicolumn{3}{|l|}{\textcoloryellow{\textbf{DTO classes and subclasses}}} \\\hline
+\multicolumn{3}{|l|}{Focus class: FunctionInFirebase.java} \\\hline
+\multicolumn{3}{|l|}{Peripheral classes: classes that extend DTO and subclasses of classes that extend DTO} \\\hline
+Rule & Attributes & \% FI that contain \\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body. & (1) class extends DTO \newline (2) class has zero-args constructor \newline (3) class has empty body & 6.5\%\\\hline
+IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body. & (1) class extends DTO \newline (2) class has zero-args constructor \newline (3) class has empty body & 5.1\%\\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+\multicolumn{3}{|l|}{\textcoloryellow{\textbf{@Entity classes}}} \\\hline
+\multicolumn{3}{|l|}{Focus class: Project.java} \\\hline
+\multicolumn{3}{|l|}{Peripheral classes: classes that have the @Entity annotation placed directly above them} \\\hline
+Rule & Attributes & \% FI that contain \\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+IF a class has an @Entity annotation THEN it must have a field annotated with @Id. & (1) class has @Entity annotation \newline (2) member field has annotation @id & 22\%\\\hline
+IF a class is a subclass of an @Entity class THEN it needs to be indexed ('index=true'). & (1) class has @Subclass notation with index = true & 48.8\% \\ \hline
+IF a class is an entity THEN it needs to have a zero-argument constructor. & (1) has @Entity annotation \newline (2) class has zero-args constructor & 20\%\\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+\multicolumn{3}{|l|}{\textcoloryellow{\textbf{Artifact classes}}} \\\hline
+\multicolumn{3}{|l|}{Focus class: Function.java} \\\hline
+\multicolumn{3}{|l|}{Peripheral classes: classes that extend Artifact class} \\\hline
+Rule & Attributes & \% FI that contain \\\hline
+\end{tabular}
+
+\begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
+IF an object is an artifact subclass THEN it needs to be an entity. & (1) extends Artifact \newline (2) class has @Entity annotation & 49.8\% \\\hline
+\end{tabular}
+
+\caption{This table contains rules that were found, their decompositions as target attributes, and the percentages of frequent itemsets containing the target attributes.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| >{\centering\arraybackslash}m{5.5cm} | >{\centering\arraybackslash}m{4.5cm} | >{\centering\arraybackslash}m{5.5cm} |}
+\hline
+Rule & Achievable & Challenge \\ \hline
+\end{tabular}
+
+Each of these rules could be represented using the attributes that we encoded from the CrowdCode database, and we were able to find these attributes in the FI's generated using the FP Growth algorithm. Rules that are found most often (had the largest percentage found in the FI's that are generated) tend to be rules in which the total number of classes in the group was moderately large, and the attributes shared between different classes overlaps but still vary moderately. 
+
+Furthermore, we found that while a great number of attributes was often generated by the algorithm, the number of those attributes found in the peripheral classes and output to the database was significantly less. Usually, over a hundred attributes would be included in the global list but about 20 different attributes would be found in the peripheral classes. In one case, over eight hundred total attributes were found in the focus class, but it shared only about 30 attributes with its peripheral classes. Thus, many FI's produced were fairly similar, differing in only a few attributes.
 
 
 
 
+\begin{tabular}{| >{\arraybackslash}m{5.5cm} | >{\arraybackslash}m{4.5cm} | >{\arraybackslash}m{5.5cm} |}
+IF a new Artifact is to be created THEN its constructor should be invoked only by its corresponding Command class. & "Artifact is to be created" (i.e., call to constructor of Artifact) & There is no current way to communicate the idea of a corresponding class. \\ \hline
+IF an Artifact needs to communicate with another artifact THEN it should create a Command describing the desired action to be performed. & N/A & Using a focus class to identify global attributes limits knowledge about attributes pertaining to classes that are not the focus class. \\ \hline
+IF a method is a static method on Command THEN it should implement its behavior by constructing a new Command subclass instance. & "A method is a static method on Command" (i.e., static method ...?) & Using a focus class to identify global attributes limits knowledge about attributes pertaining to classes that are not the focus class. \\ \hline
+IF a class is a subclass of Command THEN it should not be public. & "A class is a subclass of Command" (i.e., class extends Command) & Visibility specifiers are specific to the focus class, and including attributes' negations would explode the number of attributes and potentially fog our results with uninteresting rules. \\ \hline
+IF a class is an Entity class or subclass THEN it must be registered in CrowdServlet by ObjectifyService. & "A class is an Entity class or subclass" & \\ \hline
+IF the save method is called THEN the now() method must be followed immediately. & "The save method is called" (i.e., call to save() function) & \\ \hline
+\end{tabular}
 
+\caption{This table contains rules that were not found, their achievable components if they exist, and explanations of challenges to finding the complete rules.}
+\end{table}		
 
+We were not able to find rules because we did not have attributes that could be used to represent those rules. If the rule could be represented using our attributes, then we were able to find and group those attributes. Attributes that we found difficult to implement were often ones that dealt with the interactions between multiple classes. This is because this approach generates the list of global attributes from a single input class, our focus class. One solution may be to use all the classes in a grouping to generate the list of global attributes to see if that can help in generating such rules. 
 
+One problem that arose from the idea of using a single focus class in a grouping of classes is the idea of  ``missing" attributes; that is, attributes that we can generate if we find in the focus class but do not find or identify otherwise. One solution may be to include default attributes such as “is private class” and “is protected class” in the global set of attributes.
+
+One final set of attributes we found difficult to encode were ones dealing with order, especially the order of function calls. While such rules are often important, generating the attributes for such rules often presents scalability and tractability challenges. One possible way of trying to find such rules might use a pattern finding technique from association rule mining. The database such a technique might be trained on may be in which each row represents a different function, and the attributes for each function would represent the function calls made with in that section of the code. A sequential pattern mining algorithm would look for the patterns in this database.
 
 
 %%%%%%%%%%%%%%%%%%%
@@ -404,6 +394,8 @@ Mixed human-AI authoring of documentation has great potential for increasing and
 There are several rules kinds of attributes that we cannot represent, and, thus, we cannot find design rules that include those attributes. Attributes we still cannot represent are ones that include tracking sequential function calls and constructor calls across and within broad categories classes. Outputting these attributes usually present tractability problems and may require a different representation and algorithm in order to be detected.
 
 Another idea that needs further development and may be of use in resolving tractability and scalability challenges is the idea of \textit{interestingness}. Some attributes may be of more interest than others, and there is potential to include information from the IDE, previous documentation, and the developer in order to prioritize attributes or candidate design rules that are generated.
+
+One final challenge is the challenge of determining class groupings. Based off of our results it is obvious that the kinds of classes that are grouped and the class chosen as the focus class can have a significant impact on the type and usefulness of the FI's (and thus the rules) that are generated. One option may be to group attributes based off of parent-child inheritance relationships. Another option may be to randomly group classes and generate FI's from those groupings until interesting and meaningful groups have been formed. Both of these options have yet to be explored.
 
 While prior work has been conducted with code suggestion and degree of interest models, we believe the area of mixed human-AI documentation still has much room for improvement and study in order to more accurately and more flexibly detect the design rules used in a code base.
 
