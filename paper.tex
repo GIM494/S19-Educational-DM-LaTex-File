@@ -83,7 +83,7 @@
 %%%%%%%%%%%%%%%%%%%
 \section{Abstract} \label{abstract}
 
-Documentation is critical to preserving information about the choices about the design of a project and how those choices are implemented. However, most documentation is not updated frequently, and often only individual developers know critical pieces of information, which are integral in maintaining project coherency and forwards and backwards compatibility.  We developed an algorithm that can represent the information contained in a code base and automatically suggest likely design rules. Our results demonstrate that our algorithm can successfully represent and identify significant design rules, and has the potential to be used to automatically generate documentation for a project.
+Documentation is critical to preserving information about \textit{design rules}, which we define as the choices about the design of a project and how those choices are implemented. However, most documentation is not updated frequently, and often only individual developers know critical pieces of information that are integral in maintaining project coherency and forwards and backwards compatibility.  We developed an algorithm that can represent the information contained in a code base and automatically suggest likely design rules. Our results demonstrate that our algorithm can successfully represent and identify significant design rules, and it furthermore has the potential to be used to automatically generate documentation for a project.
 
 
 
@@ -91,15 +91,15 @@ Documentation is critical to preserving information about the choices about the 
 %%%%%%%%%%%%%%%%%%%
 \section{Introduction} \label{intro}
 
-Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed developers. As code is written and a project develops, various design decisions are made, which impact both existing and future code. Documentation of design decisions and the rationale behind those decisions is dependent on the developer and is often recorded or dispersed between several disparate locations, including a formal document, comments in the code, and the developers themselves. However, documentation is often not written, read, or updated, causing developers to depend largely on the code and other sources of information rather than explicit, written documentation. 
+Proper documentation forms an integral part of developing and maintaining software, especially given the increasing size of code bases and the prevalence of temporally and spatially dispersed developers. As code is written and a project develops, various decisions about its design are made, which impact both existing and future code. This set of choices about the code's design and how those choices are implemented is hereon defined as  \textit{design rules}. Ideally, as code is authored, it should follow design rules that were previously used to author code. Despite their significance for present and future developers, however, design rules are rarely properly documented.
 
-Ideally, as code is authored or modified, it should follow design rules that were previously used to author code. The \textit{design rules} for a project are the set of choices about the code's design and how those choices are implemented. Several sources of information, including search history, cursor location, event logs, debugger information, and the code itself can indicate what elements in the code base are most pertinent to the user and are most likely to contain design rules of interest. Some information about design rules may only be recorded in the memories of co-workers, and thus access to this kind of information is also critical for developers trying to understand and use existing code. 
+Documentation of design rules is dependent on the developer and often does not exist or is rarely read or updated. Some information about design rules may only be recorded in the memories of co-workers. When documentation exists, it is often dispersed between several locations, including a formal document, comments in the code, and the developers themselves. In short, without proper documentation, newcomers trying to understand and use existing code are limited in access to critical information about the project's design rules. Rather than explicit, written documentation, they must instead depend largely on the code itself.
 
-Mixed human-AI authoring of code patterns can greatly assist developers to efficiently and accurately develop and maintain a unified set of rules. There are an infinite number of patterns that could be found in a given code base, and an even larger diversity of representations for those patterns; therefore, the crux of the problem lies in determining how to represent the information contained in the code base and in identifying the patterns using the chosen representation. Hence our focus is on mining design rules from a given code base in any language in order to facilitate active documentation and maintenance of code.
+Mixed human-AI authoring of code patterns can greatly assist developers to efficiently and accurately develop and maintain a unified set of rules. Several sources of information, including search history, cursor location, event logs, debugger information, and the code itself can indicate what elements in the code base are most pertinent to the user and are most likely to contain design rules of interest. There is moreover an infinite number of patterns that could be found in a given code base, and an even larger number of possible representations for those patterns; therefore, the two greatest challenges lie in determining how to represent the information contained in the code base and in identifying patterns using the chosen representation. Hence our focus is on mining design rules from a given code base in any language in order to facilitate active documentation and maintenance of code.
 
 We explore how information from outside of the code base could be used to inform what patterns are identified. We seek to develop a tool that combines both automatic and manual rule-authoring capabilities. It should also automatically provide live updates with examples and violations of authored design rules. Ultimately, such a tool will greatly increase the amount of up-to-date documentation available to developers.
 
-The rest of the paper is organized as follows. Section~\ref{methods} contains assumptions that are made about developers, a discussion of the different sources of information about design rules that are available, and a description of our algorithm. We discuss our three different approaches to representing the components of design rules in Section~\ref{algm_attrApproaches}. Section~\ref{results} contains a description of the results for our algorithm, followed by a description of the tool interface in Section~\ref{toolInterface}. Finally, we discuss the short comings of our algorithm and related in works in Sections~\ref{relatedWorks} and Sections~\ref{disc}, respectively.
+The rest of the paper is organized as follows. Section~\ref{methods} contains assumptions that are made about developers, a discussion of the different sources of information about design rules that are available, and a description of our algorithm. We discuss our three different approaches to representing the components of design rules in Section~\ref{algm_attrApproaches}. Section~\ref{results} contains a description of the results for our algorithm, followed by a description of the tool interface in Section~\ref{toolInterface}. Finally, we discuss the shortcomings of our algorithm and related works in Sections~\ref{relatedWorks} and Sections~\ref{disc}, respectively.
  
  
  \clearpage
@@ -119,31 +119,31 @@ When considering our task, there exist two significant considerations: (a) what 
 
 Developers can be divided into three categories with respect to their familiarity with a project or code base. First, a developer may be experienced with a given code base. She would have a thorough understanding of the project, its objectives, and its implementation. She is in a position that allows her to author design rules and verify that certain rules have been followed throughout the project. Second, a developer may be partially knowledgable about a project and its implementation. Such a developer may have a general familiarity with the code and its implementations, but is not able to easily or confidently author design rules or may simply wish to explore possible existing design rules. On her own she is not be able to produce an accurate rule, but she might be able to see a rule and provide useful feedback on its correctness or relevancy. Finally, a developer may be completely unfamiliar with a code base. Existing design rules and documents would be extremely helpful in helping her understand the structure of the code. She may also need to frequently consult co-workers about code standards and patterns if there is a significant lack of written documentation. In such a situation, the developer may even be interested in looking for examples on what kind of existing design rules to which she should adhere.
 
- Work has already been completed with regards to the first category, and while much research has been done in code suggestion, completely automated design rule generation seems largely unexplored (see Section~\ref{relatedWorks}). Therefore, an algorithm developed with the second category of developers in mind forms a natural bridge between human authored design rules and completely automated rule authoring. Consequently, we assume the developers for which we are designing our algorithm have some general familiarity with the code and can identify proper design rules if supplied with a set of rules to consider. Thus, feedback form the developer about hypothesized rules is dependable, enabling mixed human-AI rule authoring.
+ Work has already been completed with regards to the first category, and while much research has been done in code suggestion, completely automated design rule generation seems largely unexplored (see Section~\ref{relatedWorks}). Therefore, an algorithm developed with the second category of developers in mind forms a natural bridge between human authored design rules and completely automated rule authoring. Consequently, we assume the developers for which we are designing our algorithm have some general familiarity with the code and can identify proper design rules if supplied with a set of rules to consider. Thus, feedback from the developer about hypothesized rules is dependable, enabling mixed human-AI rule authoring.
 
 
 \subsection{Sources of Information} \label{infoSrcs}
 
-	Part of knowing which sources are most useful for deriving information about design rules is understanding where developers themselves look for information about a project and what kinds of information are useful to programmers.  
+	Part of knowing which sources are most useful for deriving information about design rules is understanding where developers themselves look for information about a project and what kinds of information are actually useful to programmers.  
 
-Several studies have demonstrated that as developers work and explore a project, they try to answer high-level questions about what, why, and how code causes different program states as they try to complete a task \cite{SadowskiEtAl2015, LaTozaMyers2010, LaTozaEtAl2007}. Researchers who investigated how programmers read and explore code have found that programmers' activities include checking implementation details, checking common style, and browsing. Programmers also performed code search to understand various dependencies within and between projects, why something is failing, and the side effects of a proposed changed \cite{SadowskiEtAl2015}. 
+Several studies have demonstrated that as developers work and explore a project, they try to answer high-level questions about what, why, and how code causes different program states as they try to complete a task \cite{SadowskiEtAl2015, LaTozaMyers2010, LaTozaEtAl2007}. Researchers who investigated how programmers read and explore code have found that programmers' activities include checking implementation details, checking common style, and browsing. Programmers also performed code search to understand various dependencies within and between projects, why something is failing, and the side effects of a proposed change \cite{SadowskiEtAl2015}. 
 
-Ko et al investigate what sources of information developers use to accomplish a task and how that information affects developers' workflow throughout the day. They report that developers look at a variety of sources to accomplish a task, including check-in logs, bug reports, content management systems, version control systems, and other coworkers. Additionally, they identify knowledge about design and program behavior as the type of information that is most often deferred since unavailable coworkers are often the only source of knowledge. Developers sought out coworkers most often when there were information needs with regards to code design. Other questions to coworkers centered around following the team's conventions. Developers asked specific questions regarding what code caused different program states and behaviors and what statically related to the code of interest, but pursued the answers to these questions by starting with a hypothesis that they largely developed by using their intuition, asking coworkers, looking for execution logs, scouring bug reports, and using the debugger. They then often refined their hypothesis by using the search tool to answer questions about which sections of code performed similar operations \cite{KoEtAl2007}. 
+Ko et al in particular investigate what sources of information developers use to accomplish a task and how that information affects developers' workflow throughout the day. They report that developers consult with a variety of sources to accomplish a task, including check-in logs, bug reports, content management systems, version control systems, and other coworkers. Additionally, they identify knowledge about design and program behavior as the type of information that is most often deferred since coworkers who are unavailable are also often the only source of knowledge. Developers sought out coworkers most often when there were information needs with regards to code design. Other questions to coworkers centered around following the team's conventions. Developers asked specific questions regarding what code caused different program states and behaviors and what statically related to the code of interest, but pursued the answers to these questions by starting with a hypothesis that they largely developed by using their intuition, asking coworkers, looking for execution logs, scouring bug reports, and using the debugger. They then often refined their hypothesis by using the search tool to answer questions about which sections of code performed similar operations \cite{KoEtAl2007}. 
 
-Furthermore, Fritz et al conducted a survey of nineteen professional Java programmers in order to generate a degree of interest model to reflect developers' knowledge of code \cite{FritzEtAl2007}. The researchers' model was based on the total number of interactions the programmer has with an element and the recency of that interaction. Other factors they identified that could be used to improve their model included authorship of program elements, the role of elements, and the task being performed \cite{FritzEtAl2007}.
+Furthermore, Fritz et al conducted a survey of nineteen professional Java programmers in order to generate a degree of interest model to reflect developers' knowledge of code \cite{FritzEtAl2007}. The researchers' model was based on the total number of interactions the programmer had with an element and the recency of that interaction. Other factors they identified that could be used to improve their model included authorship of program elements, the role of elements, and the task being performed \cite{FritzEtAl2007}.
 
-Based off of  these findings, we can conclude that there are a variety of pertinent and accessible sources of information for our algorithm, including the debugger, code base, cursor location and search histories, and the developer herself. However, we focus on trying to find rules using only the code base and direct feedback from the developer. The reason for this decision is that the code base and direct feedback are the only two sources of information that we are guaranteed. Future iterations of this algorithm may also use these other sources of information to generate design rules.
+Based off of these findings, we can conclude that there are a variety of pertinent and accessible sources of information for our algorithm, including the debugger, code base, cursor location and search histories, and the developer herself. However, we focus on trying to find rules using only the code base and direct feedback from the developer. The reason for this decision is that the code base and direct feedback are the only two sources of information that are guaranteed to exist. Future iterations of this algorithm may also use these other sources of information to generate design rules.
 
 \subsection{Representing the code base and design rules}
-Our representation of the features in the code base ultimately impacts the way that we identify design rules. Ideally, we would output information only about the most critical features of the code base that can lead us to the most likely design rules. However, the code base contains a lot of information and there are many ways of representing that information. Additionally, there are scalability concerns since code bases can easily have over a quarter million lines of code. Ultimately, our representation of the features of the code base is linked to the way that design rules can be represented.
+Our representation of the features in the code base ultimately impacts the way that we identify design rules. Ideally, we would output information only about the most critical features of the code base that can lead us to the most likely design rules. However, the code base contains a lot of potentially critical information and there are many ways of representing that information. Additionally, there are scalability concerns since code bases can easily have over a quarter million lines of code. Ultimately, our representation of the features of the code base is linked to the way that design rules can be represented.
 
 Design rules can be represented as ``IF/THEN" statements where \textit{IF} some quality is true about a section of code \textit{THEN} some condition is applied. We represent different features of the code using \textit{attributes}. An attribute is a way of representing some feature(s) of the code. Thus, we can decompose design rules into a set of attributes. The ability to group attributes into ``IF" attributes and ``THEN" attributes would enable us to generate design rules. Our goal then is to associate different attributes about the code base, so we can synthesize them to create design rules. 
 
-The challenge then is what kinds of attributes to generate (that is, what kinds of representations for the code to use), since there are many different ways to represent the features of a code base (see Figure~\ref{fig:attrEx}). Consequently, there are many ways to represent a design rule (Figure~\ref{fig:drEx}). 
+The challenge then is what kinds of attributes to generate (that is, what kinds of representations for the code to use), since there are many different ways to represent the features of a code base (Figure~\ref{fig:attrEx}). Consequently, there are many ways to represent a design rule (Figure~\ref{fig:drEx}). 
 
 \begin{figure}[h!]
   \includegraphics[width=\linewidth]{attributeEx.png}
-  \caption{There are many different attributes that can be created that represent different features of the code in different ways.}
+  \caption{There are many different attributes that can be created to represent different features of the code in different ways.}
   \label{fig:attrEx}
 \end{figure}
 
@@ -167,18 +167,17 @@ We approached outputting attributes in three different ways, all of which we pre
 
 	\paragraph{Approach 1}
 	
-	The basic idea in this approach is that we would have a set of reserved item IDs corresponding to “default” attributes that we know we always have a chance of finding. For example, there is always the chance that there is a public class; thus, there is a reserved item ID corresponding to an attribute titled “is a public class”. We also output attributes that are specialized to the code base from which they are derived, such as annotations that are on classes and what classes are involved in an inheritance structure. Each line output to the database represented the set of attributes belonging to a different class in the code base.
+	The basic idea in this approach is that we reserve a set of item IDs corresponding to “default” attributes that we know we always have a chance of finding. For example, there is always the chance that there is a public class; thus, there is a reserved item ID corresponding to an attribute titled “is a public class.” We also output attributes that are specialized to the code base from which they are derived, such as annotations that are on classes and names of classes that are involved in an inheritance structure. Each line output to the database represents the set of attributes belonging to a different class in the code base.
 
 	\paragraph{Approach 2}
 	
-	The second approach entailed generating several databases that could be further mined for more detailed information. The logic behind this approach is that it might be easier to output more specific attributes for different subsets of the data that are related, and thus find more specific and interesting rules. Each starting database would have rows composed of different subsets of the data that are related. For example, one database might contain more specific attributes related to subclasses, with each row in the database representing a different subclass. Other output databases may have rows composed of the different functions in a class, and another would have rows representing different subclasses. Once these databases are generated, association rules would be derived from them. Based off the association rules that are created, a second more detailed database might be created in order to mine more specific information about the rule. For example, the database with rows made from distinct functions might generate a rule that says “IF there is a function that returns the call from a constructor 
-THEN it needs to return a specific type $<$type name$>$.” The second database created would be composed of rows all of which are functions that return the call from a constructor and return the specific type. Attributes for the derived database could include more specific characteristics about the constructor, such as the parameters required by the constructor and the type of object created by the constructor. Then, if needed, a tertiary, more specific database could be output with even more specific attributes.
+	The second approach entails generating several databases that could be further mined for more detailed information. The logic behind this approach is that it might be easier to output more specific attributes for different subsets of the data that are related, and thus find more specific and interesting rules. Each starting database has rows composed of different subsets of the data that are related. For example, one database might contain more specific attributes related to subclasses, with each row in the database representing a different subclass. Other output databases may have rows composed of the different functions in a class, and another might have rows representing different subclasses. Once these databases are generated, association rules are derived from them. Based off the association rules that are created, a second more detailed database might be created in order to mine more specific information about the rule. For example, the database with rows made from distinct functions might generate a rule that says “IF there is a function that returns the call from a constructor THEN it needs to return a specific type $<$type name$>$.” The second database created would be composed of rows, all of which are functions that return the call from a constructor and return the specific type. Attributes for the derived database could include more specific characteristics about the constructor, such as the parameters required by the constructor and the type of object created by the constructor. Then, if needed, a tertiary, more specific database could be output with even more specific attributes.
 
 	\paragraph{Approach 3}
 	
-	Our third approach entails outputting more detailed attributes about subsets of the code base and analyzing the attributes found in the subsets for design rules. For each subset of the code base, we have a \textit{focus} class from which a set of global attributes is created; any class in the subset that is not the focus class is a \textit{peripheral} class. Only the attributes found in both the focus class and peripheral classes are output. The main advantage to outputting the attributes in classes this way is that it is more scalable. Since the set of global attributes is compiled only of the attributes of a single class, a greater number of attributes can be output without significantly decreasing efficiency or scalability.
+	Our third approach entails outputting more detailed attributes about subsets of the code base and analyzing the attributes found in the subsets for design rules. For each subset of the code base, we have a \textit{focus} class from which a set of global attributes is created; any class in the subset that is not the focus class is a \textit{peripheral} class. Only the attributes found in both the focus class and peripheral classes are output. The main advantage to outputting the attributes in classes this way is that it is more scalable. Since the set of global attributes is composed only of the attributes of a single class, a greater number of attributes can be output without significantly decreasing efficiency or scalability.
 	
-	The attributes that are output are a mix of more and less detailed attributes about subsets of the different classes in the code base. Many of the same attributes are output by both this approach and Approach 1. However, in this approach we also output more specific attributes that contain information about multiple features. Attributes specifically include annotations on classes, functions, and fields complete with the annotation name and arguments, constructors storing all of the values passed as arguments in member variables, constructors having empty bodies or non-empty bodies, the return types of functions. 
+	The attributes that are output are a mix of more and less detailed attributes about subsets of the different classes in the code base. Many of the same attributes are output by both this approach and Approach 1. However, in this approach we also output more specific attributes that contain information about multiple features. Attributes specifically include annotations on classes, functions, and fields complete with the annotation name and arguments; constructors storing all of the values passed as arguments in member variables; constructors having empty bodies or non-empty bodies, and; the return types of functions.
 	
 
 
@@ -196,6 +195,8 @@ THEN it needs to return a specific type $<$type name$>$.” The second database 
 \end{minipage}
 \end{figure}
 
+
+% what is this??
 \makebox[\textwidth]{attributeFunctions.png}
 
 
@@ -204,7 +205,7 @@ THEN it needs to return a specific type $<$type name$>$.” The second database 
 \centering
 \parbox{7.5 cm}{
 \includegraphics[width=\linewidth]{attributeFields.png}
-\caption{A comparison of the attributes regarding functions produced by Approach 1, 2, and 3.}
+\caption{A comparison of the attributes regarding member fields produced by Approach 1, 2, and 3.}
 \label{fig:attrField}}
 \qquad
 \begin{minipage}{8 cm}
@@ -218,25 +219,29 @@ THEN it needs to return a specific type $<$type name$>$.” The second database 
 	
 	
 \subsubsection{Associating attributes}
-	We chose the Frequent-Pattern (FP) Growth Algorithm, which is an algorithm frequently used in association rule mining (ARM). ARM seeks to mine databases for patterns of items that frequently occur together. It is often used in market basket analysis to see what products are often purchased simultaneously. FP Growth is a type of association rule mining algorithm that efficiently finds frequent itemsets (FIs) by storing their patterns in a tree data structure. Advantages of the FP Growth algorithm include:
+	We choose the Frequent-Pattern (FP) Growth Algorithm, which is an algorithm frequently used in association rule mining (ARM). ARM seeks to mine databases for patterns of items that frequently occur together. It is often used in market basket analysis to see what products are often purchased together, for example. FP Growth is a type of association rule mining algorithm that can efficiently find rules or simply frequent itemsets (FIs) by storing their patterns in a tree data structure. Advantages of the FP Growth algorithm include its:
 	\begin{itemize}
-		\item It’s designed to find hidden patterns among items.
-		\item Its scalability and relative efficiency.
-		\item Various implementations that deal with sparse data already exist.
+		\item ability to find hidden patterns among items.
+		\item scalability and relative efficiency.
+		\item various existing implementations that deal with high dimensionality and sparse data.
 	\end{itemize}
-In our case, the items in the FIs output by the algorithm are groups of attributes that frequently appear together in the code base.
 
 There are two notions of frequency that are used in FP-Growth and other ARM techniques:
 	\begin{enumerate}
-		\item Support - the joint probability of two or more items.
-		\item Confidence - the conditional probability of two or more items.
+		\item \textit{Support} - the joint probability of two or more items.
+		\item \textit{Confidence} - the conditional probability of two or more items.
 	\end{enumerate} 
-Both are typically expressed as percentages ranging from 0-100\%, and are used to produce FIs that occur with a particular frequency. The support and frequency are used to fine tune the algorithm and varying them can result in finding different FIs.
+Both are typically expressed as percentages ranging from 0-100\%, and are used to produce FIs that occur with a particular frequency. The support and confidence are used to fine tune the algorithm, and varying them can result in finding different FIs and rules.
+
+We use an algorithm called Node-FPGrowth which only finds FIs, and in our case, the items in the FIs output are groups of attributes that frequently appear together in the code base.
+
+% citation needed
 
 \subsubsection{Generating candidate design rules}
 
-Once the FIs have been produced an extension of the algorithm produces association rules. Items in an association rule are either in the antecedent (``IF") portion of the rule or the consequent (``THEN") portion of the rule. Rules are interpreted, ``IF (\textit{insert antecedent}) THEN also (\textit{antecedents}) tend to be present". We use the association rules produced from the algorithm as our candidate design rules to present to the developer.
+Once the FIs have been produced, an extension of the algorithm produces association rules. Items in an association rule are either in the antecedent (``IF") portion of the rule or the consequent (``THEN") portion of the rule. Rules are interpreted, ``IF (\textit{insert antecedent}) THEN also (\textit{antecedents}) tend to be present". We use the association rules produced from the algorithm as our candidate design rules to present to the developer.
 
+% remove this section altogether?
 
 \subsubsection{Selecting queries to present to user}
 
@@ -248,20 +253,23 @@ Once the FIs have been produced an extension of the algorithm produces associati
 \section{Results} \label{results}
 In order to assess our success in identifying “interesting” rules, we used a set of sample design rules written for a java-based project called CrowdCode. CrowdCode is a program designed to help groups of developers delegate and keep track of tasks for large coding projects and software. For each approach discussed in Section~\ref{algm}, we analyze how well we could reproduce the sample design rules for CrowdCode as well as scalability concerns.
 
+
 	\subsection{Approach 1}
-	This approach was not successful even when used with lower support (20-40\%). The general problem was that associations produced from this database were uninteresting and obvious. For example, many of the rules produced were rules such as, “IF it is a public class THEN it has a public function” or “IF it is a class with annotation @$<$class name$>$ THEN it is a class that has an annotation”. 
+	This approach was unsuccessful, even when used with lower support (20-40\%). Associations produced from this database were generally uninteresting and obvious. For example, many of the rules produced were rules such as, “IF it is a public class THEN it has a public function,” or “IF it is a class with annotation @$<$class name$>$ THEN it is a class that has an annotation.”
 
 The reason such association rules were output is due to the fact that all the attributes were fairly general, and many default attributes overlapped with more specific attributes, such as the above example with annotations. These overlapping attributes always occurred together, and thus most of the rules FP-Growth produced were made of overlapping attributes. Hence, more interesting rules could not be discovered.
 
 	\subsection{Approach 2}
-	The main prohibiting factor in this approach, is the total number of tables created and the total number of times the code would need to be traversed to create all of the tables. Consequently, we found this approach to be impractical, and did not seek to pursue this approach further.
+	The main prohibiting factor in this approach is the total number of tables created and the total number of times the code would need to be traversed to create all of the tables. Consequently, we found this approach to be impractical and did not pursue this approach further.
 
 	\subsection{Approach 3}
 	
-	We explored 6 different groups of files to test if we could find the attributes of interest. The focus class was chosen as the class with the largest file size that was not the parent class if there was an inheritance structure. We present the groups of classes that were successfully used to identify one of our target design rules. Under each group of classes, we list the rules that we found along with an explanation. A discussion of what rules could not be discovered and why follows this portion. Supplementary material contains the output for all six groupings. 
+	We explored 6 different groups of files to test if we could find the attributes of interest. The focus class was chosen as the class with the largest file size that was not the parent class if there was an inheritance structure. We present the groups of classes that were successfully used to identify one of our target design rules. Under each group of classes, we list the rules that we found along with their decompositions as target attributes and the percentages of FIs containing all target attributes. A discussion of what rules could not be discovered and why follows this portion. Supplementary material contains the output for all six groupings. 
 	
 	
-	We used support 60\% for all our tests, except for the test used to generate the rule ``IF a class has an @Entity annotation THEN it must have a field annotated with @Id"; a support of 50\% was used. Lowered support was used to restrict the number of FI's produced by the algorithm. Although confidence is used in many ARM techniques, it is not used in generating FI's; thus, we did not have to specify a confidence level for the algorithm. 
+	We used 60\% support for all tests, except for the test used to generate the rule ``IF a class has an @Entity annotation THEN it must have a field annotated with @Id"; a support of 50\% was used instead. Lowered support was necessary because otherwise, the attributes did not occur frequently enough to appear as FIs. Although confidence is used in many ARM techniques, it is not used in generating FIs; thus, we did not have to specify a confidence level for the algorithm. 
+	
+	Also note that the rule "IF an object is an artifact subclass THEN it needs to be an entity" reports a more approximate result than other rule because the algorithm timed out before finishing generating the entire set of frequent itemsets.
 	
 	
 \definecolor{yellow}{rgb}{1,1,0.6}
@@ -274,7 +282,7 @@ The reason such association rules were output is due to the fact that all the at
 \multicolumn{3}{|l|}{\textcoloryellow{\textbf{Command classes}}} \\\hline
 \multicolumn{3}{|l|}{Focus class: QuestioningCommand.java} \\\hline
 \multicolumn{3}{|l|}{Peripheral classes: Command class and classes that extend Command} \\\hline
-Rule & Attributes & \% FI that contain \\\hline
+Rule & Attributes & \% FIs \\\hline
 \end{tabular}
 
 \begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
@@ -283,14 +291,15 @@ IF a constructor is for a subclass of Command THEN it should store each paramete
 \end{tabular}
 
 \begin{tabular}{| >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
-\multicolumn{3}{|l|}{\textcoloryellow{\textbf{DTO classes and subclasses}}} \\\hline
+\multicolumn{3}{|l|}{\textcoloryellow{\textbf{DTO classes*, subclasses**}}} \\\hline
 \multicolumn{3}{|l|}{Focus class: FunctionInFirebase.java} \\\hline
-\multicolumn{3}{|l|}{Peripheral classes: classes that extend DTO and subclasses of classes that extend DTO} \\\hline
-Rule & Attributes & \% FI that contain \\\hline
+\multicolumn{3}{|l|}{*Peripheral classes: classes that extend DTO} \\\hline
+Rule & Attributes & \% FIs \\\hline
 \end{tabular}
 
 \begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
 IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body. & (1) class extends DTO \newline (2) class has zero-args constructor \newline (3) class has empty body & 6.5\%\\\hline
+\multicolumn{3}{|l|}{**Peripheral classes: classes that extend DTO and subclasses of classes that extend DTO} \\\hline
 IF a class is a DTO object THEN it needs to have a zero-argument constructor with an empty body. & (1) class extends DTO \newline (2) class has zero-args constructor \newline (3) class has empty body & 5.1\%\\\hline
 \end{tabular}
 
@@ -298,7 +307,7 @@ IF a class is a DTO object THEN it needs to have a zero-argument constructor wit
 \multicolumn{3}{|l|}{\textcoloryellow{\textbf{@Entity classes}}} \\\hline
 \multicolumn{3}{|l|}{Focus class: Project.java} \\\hline
 \multicolumn{3}{|l|}{Peripheral classes: classes that have the @Entity annotation placed directly above them} \\\hline
-Rule & Attributes & \% FI that contain \\\hline
+Rule & Attributes & \% FIs \\\hline
 \end{tabular}
 
 \begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
@@ -311,37 +320,34 @@ IF a class is an entity THEN it needs to have a zero-argument constructor. & (1)
 \multicolumn{3}{|l|}{\textcoloryellow{\textbf{Artifact classes}}} \\\hline
 \multicolumn{3}{|l|}{Focus class: Function.java} \\\hline
 \multicolumn{3}{|l|}{Peripheral classes: classes that extend Artifact class} \\\hline
-Rule & Attributes & \% FI that contain \\\hline
+Rule & Attributes & \% FIs \\\hline
 \end{tabular}
 
 \begin{tabular}{| >{\arraybackslash}m{6.5cm} | >{\arraybackslash}m{6.5cm} | >{\centering\arraybackslash}m{2.5cm} |}
-IF an object is an artifact subclass THEN it needs to be an entity. & (1) extends Artifact \newline (2) class has @Entity annotation & 49.8\% \\\hline
+IF an object is an artifact subclass THEN it needs to be an entity. & (1) extends Artifact \newline (2) class has @Entity annotation & \~{}49.8\% \\\hline
 \end{tabular}
 
 \caption{This table contains rules that were found, their decompositions as target attributes, and the percentages of frequent itemsets containing the target attributes.}
 \end{table}
+Each of these rules could be represented using the attributes that we encoded from the CrowdCode database, and we were able to find these attributes in the FIs generated using the FP Growth algorithm. Rules that are found most often (had the largest percentage found in the FIs that are generated) tend to be rules in which the total number of classes in the group was moderately large, and the attributes shared between different classes overlaps but still vary moderately. 
+
+Furthermore, we found that while a great number of attributes was often generated by the algorithm, the number of those attributes found in the peripheral classes and output to the database was significantly less. Usually, over a hundred attributes would be included in the global list but about 20 different attributes would be found in the peripheral classes. In one case, over eight hundred total attributes were found in the focus class, but it shared only about 30 attributes with its peripheral classes. Thus, many FI's produced were fairly similar, differing in only a few attributes.
+
 
 \begin{table}[H]
 \centering
 \begin{tabular}{| >{\centering\arraybackslash}m{5.5cm} | >{\centering\arraybackslash}m{4.5cm} | >{\centering\arraybackslash}m{5.5cm} |}
 \hline
-Rule & Achievable & Challenge \\ \hline
+Rule & Achievable & Challenge(s) \\ \hline
 \end{tabular}
-
-Each of these rules could be represented using the attributes that we encoded from the CrowdCode database, and we were able to find these attributes in the FI's generated using the FP Growth algorithm. Rules that are found most often (had the largest percentage found in the FI's that are generated) tend to be rules in which the total number of classes in the group was moderately large, and the attributes shared between different classes overlaps but still vary moderately. 
-
-Furthermore, we found that while a great number of attributes was often generated by the algorithm, the number of those attributes found in the peripheral classes and output to the database was significantly less. Usually, over a hundred attributes would be included in the global list but about 20 different attributes would be found in the peripheral classes. In one case, over eight hundred total attributes were found in the focus class, but it shared only about 30 attributes with its peripheral classes. Thus, many FI's produced were fairly similar, differing in only a few attributes.
-
-
-
 
 \begin{tabular}{| >{\arraybackslash}m{5.5cm} | >{\arraybackslash}m{4.5cm} | >{\arraybackslash}m{5.5cm} |}
 IF a new Artifact is to be created THEN its constructor should be invoked only by its corresponding Command class. & "Artifact is to be created" (i.e., call to constructor of Artifact) & There is no current way to communicate the idea of a corresponding class. \\ \hline
 IF an Artifact needs to communicate with another artifact THEN it should create a Command describing the desired action to be performed. & N/A & Using a focus class to identify global attributes limits knowledge about attributes pertaining to classes that are not the focus class. \\ \hline
 IF a method is a static method on Command THEN it should implement its behavior by constructing a new Command subclass instance. & "A method is a static method on Command" (i.e., static method ...?) & Using a focus class to identify global attributes limits knowledge about attributes pertaining to classes that are not the focus class. \\ \hline
 IF a class is a subclass of Command THEN it should not be public. & "A class is a subclass of Command" (i.e., class extends Command) & Visibility specifiers are specific to the focus class, and including attributes' negations would explode the number of attributes and potentially fog our results with uninteresting rules. \\ \hline
-IF a class is an Entity class or subclass THEN it must be registered in CrowdServlet by ObjectifyService. & "A class is an Entity class or subclass" & \\ \hline
-IF the save method is called THEN the now() method must be followed immediately. & "The save method is called" (i.e., call to save() function) & \\ \hline
+IF a class is an Entity class or subclass THEN it must be registered in CrowdServlet by ObjectifyService. & "A class is an Entity class or subclass" & Registering a class must be done by a certain object with a specific argument, so the scalability of outputting information about every function call made by different classes makes representing this information intractable. \\ \hline
+IF the save method is called THEN the now() method must be followed immediately. & "The save method is called" (i.e., call to save() function) & There may be hundreds of thousands of function calls in a given code base, so the scalability of outputting information about their sequential orders makes representing this information intractable. \\ \hline
 \end{tabular}
 
 \caption{This table contains rules that were not found, their achievable components if they exist, and explanations of challenges to finding the complete rules.}
@@ -361,7 +367,7 @@ There are several major considerations even when we narrow our focus to a develo
 
 There are sundry sources of data available that can and do provide information about the code base and what sections of the code in which the developer might be most interested. The most obvious source of information about the code is the code itself. Using a tool called srcML, the code can be put in a specific XML format that can then be searched using XPaths. Thus we can identify all kinds of information about the code itself, including function and class names and declarations, member variables, and relationships between classes like child and parent classes. Information is also available from the IDE itself. Such information can include the cursor's current and previous location, the user's search history, and which file windows are currently open in the project. Finally, the tool itself could be a possible source of information. For example, information about existing rules may be used to help improve the relevancy of the design rules presented to the developer.
 
-There are a couple of approaches that could be taken with respect to different approaches to ensure relevant design rule suggestions. One way of viewing this challenge is to view it as a source of natural language programming (NLP) problem. One group of researchers were trying to improve code suggestions and viewed their challenge as analogous to a more traditional NLP problem of trying to fill in a missing word in a sentence. They developed a statistical language model to aid in providing suggestions for different code snippets \cite{RaychevEtAl2014}. We could think of our challenge as analogous to an NLP problem that aims to outline to a corpus of text or maybe, even more abstractly, find rhetorical devices in a text. Alternatively, we could simply rely more on traditional papers and research that have been conducted in this area that do not rely on NLP techniques to provide solutions. Both perspective may prove useful in the initial stages of research that entail exploring different ways that information is stored and what information about developer activity has seemed most helpful in designing related tools. 
+There are a couple of approaches that could be taken with respect to different approaches to ensure relevant design rule suggestions. One way of viewing this challenge is to view it as a source of natural language programming (NLP) problem. One group of researchers were trying to improve code suggestions and viewed their challenge as analogous to a more traditional NLP problem of trying to fill in a missing word in a sentence. They developed a statistical language model to aid in providing suggestions for different code snippets \cite{RaychevEtAl2014}. We could think of our challenge as analogous to an NLP problem that aims to outline a corpus of text or maybe, even more abstractly, find rhetorical devices in a text. Alternatively, we could simply rely more on traditional papers and research that have been conducted in this area that do not rely on NLP techniques to provide solutions. Both perspectives may prove useful in the initial stages of research that entail exploring different ways that information is stored and what information about developer activity has seemed most helpful in designing related tools. 
 
 
 
@@ -373,7 +379,7 @@ There are a couple of approaches that could be taken with respect to different a
 
 \section{Related works}\label{relatedWorks}
 
-Many tools and methods have been devised to augment programmers' ability to accomplish a task including code recommender systems for novices \cite{HartmannEtAl2010}, search tools for identifying bugs \cite{HovemeyerPugh2004}, search tools for identifying relevant API functions and the sections of code that need to be altered \cite{RongEtAl2016}, and code suggestion \cite{RaychevEtAl2014}. However, one area that seems largely unexplored is tools that facilitate the documentation of code.
+Many tools and methods have been devised to augment programmers' abilities to accomplish a task including code recommender systems for novices \cite{HartmannEtAl2010}, search tools for identifying bugs \cite{HovemeyerPugh2004}, search tools for identifying relevant API functions and the sections of code that need to be altered \cite{RongEtAl2016}, and code suggestion \cite{RaychevEtAl2014}. However, one area that seems largely unexplored is tools that facilitate the automated documentation of code.
 
 Some researchers developed a tool to help a person who is new to an open-source software project find relevant artifacts to a project in order to facilitate their ability to more quickly perform a given task. They consider all of the previously produced material, including versions of the source, the bugs, archived electronic communication, and web documents, to suggest possibly relevant sources of information to a user \cite{CubranicMurphy2003}.
 
@@ -389,13 +395,13 @@ ActiveDocumentation is a plug-in for IntelliJ IDEA that can be used to author ru
 
 \section{Discussion and Conclusion}\label{disc}
 
-Mixed human-AI authoring of documentation has great potential for increasing and maintaining up-to-date documentation about code bases. In this paper, we present three different approaches for outputting attributes about a project code base. The results show that using the third approach we can have a flexible representation of  many design rules that we might wish to find in a code base. They also show that there seems to be a tractable and fast way of analyzing code to detect design rules.
+Mixed human-AI authoring of documentation has great potential for increasing and maintaining up-to-date documentation about code bases. In this paper, we present three different approaches for outputting attributes about a project code base. The results show that, using the third approach, we can have a flexible representation of many design rules that we might wish to find in a code base. They also show that there seems to be a tractable and fast way of analyzing code to detect design rules.
 
-There are several rules kinds of attributes that we cannot represent, and, thus, we cannot find design rules that include those attributes. Attributes we still cannot represent are ones that include tracking sequential function calls and constructor calls across and within broad categories classes. Outputting these attributes usually present tractability problems and may require a different representation and algorithm in order to be detected.
+There are several kinds of attributes that we cannot represent, and, thus, we cannot find design rules that include those attributes. Attributes we still cannot represent are ones that include tracking sequential function calls and constructor calls across and within broad categories of classes. Outputting these attributes usually present tractability problems and may require a different representation and algorithm in order to be detected.
 
 Another idea that needs further development and may be of use in resolving tractability and scalability challenges is the idea of \textit{interestingness}. Some attributes may be of more interest than others, and there is potential to include information from the IDE, previous documentation, and the developer in order to prioritize attributes or candidate design rules that are generated.
 
-One final challenge is the challenge of determining class groupings. Based off of our results it is obvious that the kinds of classes that are grouped and the class chosen as the focus class can have a significant impact on the type and usefulness of the FI's (and thus the rules) that are generated. One option may be to group attributes based off of parent-child inheritance relationships. Another option may be to randomly group classes and generate FI's from those groupings until interesting and meaningful groups have been formed. Both of these options have yet to be explored.
+One final challenge is the challenge of determining class groupings. Based off of our results, it is obvious that the kinds of classes that are grouped and the class chosen as the focus class can have a significant impact on the type and usefulness of the FIs (and thus the rules) that are generated. One option may be to group attributes based off of parent-child inheritance relationships. Another option may be to randomly group classes and generate FI's from those groupings until interesting and meaningful groups have been formed. Both of these options have yet to be explored.
 
 While prior work has been conducted with code suggestion and degree of interest models, we believe the area of mixed human-AI documentation still has much room for improvement and study in order to more accurately and more flexibly detect the design rules used in a code base.
 
